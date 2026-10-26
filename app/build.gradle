@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
 }
 
+def releaseKeystorePath = System.getenv('UNBAR_KEYSTORE_FILE')
+
 android {
     namespace 'io.github.unbar'
     compileSdk 35
@@ -14,9 +16,23 @@ android {
         versionName '0.3.0'
     }
 
+    if (releaseKeystorePath) {
+        signingConfigs {
+            release {
+                storeFile file(releaseKeystorePath)
+                storePassword System.getenv('UNBAR_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('UNBAR_KEY_ALIAS')
+                keyPassword System.getenv('UNBAR_KEY_PASSWORD')
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
+            if (releaseKeystorePath) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 

@@ -9,7 +9,7 @@
 ## 安装
 
 1. 保持 KernelSU、Zygisk Next 和 LSPosed/Vector 已启用。
-2. 安装构建得到的 APK（见下方“构建”）。
+2. 从 [Releases](https://github.com/cr4n5/Unbar/releases) 下载并安装对应版本的 `Unbar-vX.Y.Z.apk`，或自行构建用于测试的 APK。
 3. 在 LSPosed 中启用模块，作用域只选择“系统框架（android）”。
 4. 重启手机。
 5. 从桌面打开“Unbar 状态栏拦截”，选择应用并保存。
@@ -26,7 +26,18 @@
 ./gradlew :app:assembleDebug
 ```
 
-Windows 使用 `gradlew.bat :app:assembleDebug`。生成的 APK 位于 `app/build/outputs/apk/debug/app-debug.apk`，可用于本地安装验证。正式分发时应自行配置签名并构建 Release APK；仓库不包含签名密钥或旧版二进制文件。
+Windows 使用 `gradlew.bat :app:assembleDebug`。生成的 APK 位于 `app/build/outputs/apk/debug/app-debug.apk`，可用于本地安装验证。推送到 `main` 或提交 Pull Request 时，GitHub Actions 也会自动构建 Debug APK，并在对应运行记录中提供下载。
+
+## 自动发布
+
+发布工作流使用仓库的 Actions Secrets 保存签名信息：
+
+- `UNBAR_KEYSTORE_BASE64`：Release 密钥库文件的 Base64 内容。
+- `UNBAR_KEYSTORE_PASSWORD`：密钥库密码。
+- `UNBAR_KEY_ALIAS`：密钥别名。
+- `UNBAR_KEY_PASSWORD`：密钥密码。
+
+将 `app/build.gradle` 中的 `versionCode` 和 `versionName` 更新为新版本，再推送与 `versionName` 一致的 `vX.Y.Z` 标签。GitHub Actions 会构建已签名的 Release APK，验证签名，并创建附带 APK 和 SHA-256 校验文件的 GitHub Release。使用同一签名密钥，才能直接覆盖安装已有版本。仓库不包含签名密钥或旧版二进制文件。
 
 ## 验证和日志
 
